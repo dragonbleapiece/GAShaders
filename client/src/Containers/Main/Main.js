@@ -8,7 +8,7 @@ import {
 import Helpers from '../../Helpers/Helpers.js';
 import Thumbnail from '../../Components/Thumbnail/Thumbnail.js';
 import Demo from '../Demo/Demo.js';
-
+import './Main.css';
 
 class Main extends Component {
 
@@ -44,13 +44,17 @@ class Main extends Component {
         );
 
         return (
-            <main className="App-main">
-                <Switch>
-                    <Route exact path="/">
-                        {thumbnails}
-                    </Route>
-                    <Route path="/shader/:folderName" component={Demo} />
-                </Switch>
+            <main id='main'>
+                <div className='inner'>
+                    <Switch>
+                        <Route exact path="/">
+                            <div className='thumbnails'>
+                                {thumbnails}
+                            </div>
+                        </Route>
+                        <Route path="/shader/:folderName" component={Demo} />
+                    </Switch>
+                </div>
             </main>
         );
     }
