@@ -1,0 +1,4 @@
+.Demo__elements {
+    display: flex;
+    flex-direction: row;
+}

@@ -3,12 +3,22 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useParams
 } from "react-router-dom";
 import Helpers from '../../Helpers/Helpers.js';
 import Thumbnail from '../../Components/Thumbnail/Thumbnail.js';
 import Demo from '../Demo/Demo.js';
 import './Main.css';
+
+
+const Wrapper = () => {
+    const { folderName } = useParams();
+
+    return (
+        <Demo folderName={folderName}/>
+    );
+}
 
 class Main extends Component {
 
@@ -52,7 +62,7 @@ class Main extends Component {
                                 {thumbnails}
                             </div>
                         </Route>
-                        <Route path="/shader/:folderName" component={Demo} />
+                        <Route path="/shader/:folderName" component={Wrapper}/>
                     </Switch>
                 </div>
             </main>

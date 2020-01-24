@@ -9,17 +9,3 @@ main {
     }
 
 }
-
-main .inner {
-    width: 90%;
-    max-width: 80em;
-    margin: 0 auto;
-}
-
-@media screen and (max-width: 480px) {
-
-    main .inner {
-        width: 95%;
-    }
-
-}

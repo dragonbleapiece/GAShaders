@@ -1,0 +1,49 @@
+.ShaderCode {
+    width: 50%;
+}
+
+.ShaderCode__header {
+    background-color: #1b1b1f;
+    height: 50px;
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: center;
+}
+
+.ShaderCode__header h2 {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.ShaderCode__inputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    height: 100%;
+}
+
+.ShaderCode__input {
+    margin-left: 10px;
+}
+
+.ShaderCode__input input {
+    display: none;
+}
+
+.Highlighter {
+    width: 100%;
+    height: calc(100% - 50px);
+    box-shadow: inset rgb(27, 27, 27) 0 3px 2px;
+}
+
+.Highlighter code {
+    height: 100%;
+}
+
+.Highlighter {
+    margin: 0;
+}
