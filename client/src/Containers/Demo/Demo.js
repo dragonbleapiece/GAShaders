@@ -11,12 +11,13 @@ class Demo extends Component {
         fragment: null,
         vertex: null
     }
-    
+
     componentDidMount() {
         this.getShaders();
     }
 
     getShaders() {
+        
         Helpers.getVertex(this.props.folderName)
         .then(res => res.text())
         .then(vertex => this.setState({ vertex }))
@@ -29,12 +30,18 @@ class Demo extends Component {
     }
 
     render() {
+        const promise = new Promise((resolve, reject) => {
+            if(this.state.vertex && this.state.fragment) {
+                resolve(this.state)
+            }
+        });
+
         return (
             <div className='Demo'>
                 <h1>{this.props.folderName}</h1>
                 <div className='Demo__elements'>
-                    <ThreeCanvas/>
-                    <ShaderCode vertex={this.state.vertex} fragment={this.state.fragment}/>
+                    <ThreeCanvas promise={promise} />
+                    <ShaderCode vertex={this.state.vertex} fragment={this.state.fragment} />
                 </div>
             </div>
         );

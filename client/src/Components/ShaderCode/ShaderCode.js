@@ -4,30 +4,16 @@ import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import Helpers from '../../Helpers/Helpers.js';
 import './ShaderCode.css';
 
+const LOADING = 'loading...';
+
 class ShaderCode extends Component {
 
     state = {
         current: 0
     };
-
-    constructor(props) {
-        super(props);
-        this.fragment = this.props.fragment ? this.props.fragment : 'loading...';
-        this.vertex = this.props.vertex ? this.props.vertex : 'loading...';
-        if(!this.props.fragment || !this.props.vertex) {
-            console.error('Must have the fragment and vertex shaders in props');
-        }
-    }
-
-    componentDidUpdate() {
-        this.fragment = this.props.fragment ? this.props.fragment : 'no fragment to show';
-        this.vertex = this.props.vertex ? this.props.vertex : 'no vertex to show';
-    }
+    
 
     render() {
-
-        console.log('fragment', this.fragment);
-        console.log('vertex', this.vertex);
 
         const shaders = ['vertex', 'fragment'];
         const Inputs = shaders.map((shader, index) =>
@@ -44,6 +30,9 @@ class ShaderCode extends Component {
             </div>
         );
 
+        const vertex = this.props.vertex ? this.props.vertex : LOADING;
+        const fragment = this.props.fragment ? this.props.fragment : LOADING;
+
         return (
             <div className='ShaderCode'>
                 <div className='ShaderCode__header'>
@@ -52,8 +41,8 @@ class ShaderCode extends Component {
                         {Inputs}
                     </div>
                 </div>
-                <SyntaxHighlighter language='glsl' style={atomOneDark} className='Highlighter' showLineNumbers={true} >
-                    {this.state.current === 0 ? this.vertex : this.fragment}
+                <SyntaxHighlighter language='glsl' style={atomOneDark} className='Highlighter' showLineNumbers={true}  wrapLines={true}>
+                    {this.state.current === 0 ? vertex : fragment}
                 </SyntaxHighlighter>
             </div>
         );

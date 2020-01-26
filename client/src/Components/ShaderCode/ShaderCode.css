@@ -36,12 +36,12 @@
 
 .Highlighter {
     width: 100%;
+    max-height: calc(50vh - 50px);
     height: calc(100% - 50px);
+    max-width: 100%;
+    overflow-y: auto;
+    /*overflow-x: hidden !important;*/
     box-shadow: inset rgb(27, 27, 27) 0 3px 2px;
-}
-
-.Highlighter code {
-    height: 100%;
 }
 
 .Highlighter {
