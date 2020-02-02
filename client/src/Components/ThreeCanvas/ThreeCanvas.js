@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Helpers from '../../Helpers/Helpers.js';
+import Algebra from 'ganja.js';
 import './ThreeCanvas.css';
 
 class ThreeCanvas extends Component {
@@ -26,6 +27,7 @@ class ThreeCanvas extends Component {
     }
 
     onResize(e) {
+        if(!this.refs.container) return;
         const rectContainer = this.refs.container.getBoundingClientRect();
         this.renderer.setSize( rectContainer.width, rectContainer.height );
         this.camera.aspect = rectContainer.width / rectContainer.height;
@@ -168,6 +170,10 @@ class ThreeCanvas extends Component {
         });
 
         return node;
+    }
+
+    GALoad() {
+        
     }
 
     render() {
