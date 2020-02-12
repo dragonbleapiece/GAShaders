@@ -12,6 +12,8 @@ class ThreeCanvas extends Component {
         super(props);
         this.renderer = null;
         this.camera = null;
+        this.clock = new THREE.Clock();
+        this.clock.start();
     }
 
 
@@ -85,6 +87,7 @@ class ThreeCanvas extends Component {
             
                         // required if controls.enableDamping or controls.autoRotate are set to true
                         controls.update();
+                        self.updateShader(scene);
             
                         self.renderer.render( scene, self.camera );
                     };
@@ -109,10 +112,24 @@ class ThreeCanvas extends Component {
         
     }
 
+    updateShader(node) {
+        node.children.forEach((child, index) => {
+            if(child.isMesh) {
+                child.material.uniforms.u_time.value = this.clock.getElapsedTime();
+            }
+
+            this.updateShader(child);
+        });
+    }
+
     includeShader(node, vertex, fragment) {
         node.children.forEach((child, index) => {
             if(child.isMesh) {
                 const oldMat = child.material;
+                const uniforms = THREE.UniformsUtils.merge([
+                    THREE.UniformsLib["ambient"],
+                    THREE.UniformsLib["lights"]
+                ]);
                 const material = new THREE.ShaderMaterial( {
                     uniforms: {
                         alphaMap: {value: oldMat.alphaMap},
@@ -140,7 +157,10 @@ class ThreeCanvas extends Component {
                         refractionRatio: {value: oldMat.refractionRatio},
                         roughness: {value: oldMat.roughness},
                         roughnessMap: {value: oldMat.roughnessMap},
-                        opacity: {value: oldMat.opacity}
+                        opacity: {value: oldMat.opacity},
+                        u_time: {value: this.clock.getElapsedTime()},
+                        u_resolution: {value: THREE.Vector3(1, 1)},
+                        ...uniforms
                     },
                 
                     extensions: {
@@ -156,12 +176,16 @@ class ThreeCanvas extends Component {
 
                     vertexShader: vertex,
                 
-                    fragmentShader: fragment
+                    fragmentShader: fragment,
+                    lights: true
                 
                 } );
 
-
-                material.map = oldMat.map;
+                for(let key in oldMat) {
+                    if(!material[key] && key !== "isMeshStandardMaterial" && key !== "name") {
+                        material[key] = oldMat[key];
+                    }
+                }
                 node.children[index].material = material;
 
             }

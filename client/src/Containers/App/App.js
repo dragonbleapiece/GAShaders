@@ -5,7 +5,7 @@ import Banner from '../Banner/Banner.js'
 import {Switch, Route, Link} from 'react-router-dom';
 import * as THREE from 'three';
 import pga3d from '../../Assets/Shaders/pga3d.glsl';
-import cga from '../../Assets/Shaders/cga.glsl';
+import cga from '../../Assets/Shaders/cga_ganja.glsl';
 import './normalize.css';
 import './App.css';
 

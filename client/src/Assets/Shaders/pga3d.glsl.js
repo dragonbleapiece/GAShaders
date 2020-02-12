@@ -46,47 +46,6 @@ PGA3D initPGA3D() {
   return PGA3D(0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.);
 }
 
-// Init a PGA3D struct
-PGA3D initPGA3D(float f, int idx) {
-  PGA3D res = initPGA3D();
-  
-  if(idx == 0) {
-    res.one = f;
-  } else if(idx == 1) {
-    res.e0 = f;
-  } else if(idx == 2) {
-    res.e1 = f;
-  } else if(idx == 3) {
-    res.e2 = f;
-  } else if(idx == 4) {
-    res.e3 = f;
-  } else if(idx == 5) {
-    res.e01 = f;
-  } else if(idx == 6) {
-    res.e02 = f;
-  } else if(idx == 7) {
-    res.e03 = f;
-  } else if(idx == 8) {
-    res.e12 = f;
-  } else if(idx == 9) {
-    res.e31 = f;
-  } else if(idx == 10) {
-    res.e23 = f;
-  } else if(idx == 11) {
-    res.e021 = f;
-  } else if(idx == 12) {
-    res.e013 = f;
-  } else if(idx == 13) {
-    res.e032 = f;
-  } else if(idx == 14) {
-    res.e123 = f;
-  } else if(idx == 15) {
-    res.e0123 = f;
-  }
-
-  return res;
-}
-
 //***********************
 // PGA3D.Reverse : res = ~a
 // Reverse the order of the basis blades.
@@ -581,8 +540,8 @@ PGA3D point(float x, float y, float z) {
 // we start with a function that generates motors.
 // circle(t) with t going from 0 to 1.
 PGA3D circle(float t, float radius, PGA3D line) {
-  PGA3D e0 = initPGA3D(1.0,1);
-  PGA3D e1 = initPGA3D(1.0,2);
+  PGA3D e0 = get_e0();
+  PGA3D e1 = get_e1();
 
   return geoProduct(rotor(t*2.0*PI,line), translator(radius, geoProduct(e1, e0)));
 }
@@ -591,4 +550,9 @@ PGA3D circle(float t, float radius, PGA3D line) {
 PGA3D torus(float s, float t, float r1, PGA3D l1, float r2, PGA3D l2) {
   return geoProduct(circle(s,r2,l2), circle(t,r1,l1));
 }
+
+PGA3D point(vec4 v) {
+  return point(v.x, v.y, v.z);
+}
+
 `;
