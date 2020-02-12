@@ -1,5 +1,11 @@
 .ShaderCode {
-    width: 50%;
+    width: 100%;
+    margin-top: -50vh;
+}
+
+.ShaderCode code span {
+    z-index: 1;
+    position: relative;
 }
 
 .ShaderCode__header {
@@ -10,9 +16,12 @@
     flex-direction: row;
     justify-content: right;
     align-items: center;
+    position: sticky;
+    top: 25px;
+    z-index: 999;
 }
 
-.ShaderCode__header h2 {
+.ShaderCode__header h1 {
     flex-grow: 1;
     margin: 0;
 }
@@ -24,6 +33,8 @@
     align-items: center;
     padding: 5px 10px;
     height: 100%;
+    position: absolute;
+    right: 10px;
 }
 
 .ShaderCode__input {
@@ -36,12 +47,9 @@
 
 .Highlighter {
     width: 100%;
-    max-height: calc(50vh - 50px);
-    height: calc(100% - 50px);
     max-width: 100%;
-    overflow-y: auto;
+    overflow-y: visible;
     /*overflow-x: hidden !important;*/
-    box-shadow: inset rgb(27, 27, 27) 0 3px 2px;
 }
 
 .Highlighter {

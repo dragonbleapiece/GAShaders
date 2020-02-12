@@ -21,6 +21,7 @@
     position: relative;
     text-align: center;
     overflow: hidden;
+    margin-bottom: 4em;
 }
 
 #banner .inner {
@@ -110,21 +111,6 @@
         color: #FFF;
     }
 
-#banner video {
-    -moz-transform: translateX(50%) translateY(50%);
-    -webkit-transform: translateX(50%) translateY(50%);
-    -ms-transform: translateX(50%) translateY(50%);
-    transform: translateX(50%) translateY(50%);
-    position: absolute;
-    bottom: 50%;
-    right: 50%;
-    width: auto;
-    height: auto;
-    min-width: 100%;
-    min-height: 100%;
-    overflow: hidden;
-}
-
 #banner:before {
     -moz-transition: opacity 3s ease;
     -webkit-transition: opacity 3s ease;
@@ -167,6 +153,7 @@
     #banner {
         min-height: 0;
         padding: 6em 2em 4em 2em;
+        margin-bottom: 3em;
     }
 
         #banner br {

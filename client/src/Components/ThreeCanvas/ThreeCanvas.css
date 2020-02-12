@@ -1,4 +1,7 @@
 .ThreeCanvas {
+    flex-grow: 0.5;
     width: 50%;
     height: 50vh;
+    position: sticky;
+    top: 75px;
 }

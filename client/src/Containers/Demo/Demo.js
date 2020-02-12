@@ -5,11 +5,13 @@ import ThreeCanvas from "../../Components/ThreeCanvas/ThreeCanvas.js";
 import ShaderCode from '../../Components/ShaderCode/ShaderCode.js';
 import './Demo.css';
 
+const shaders = ['vertex', 'fragment'];
+
 class Demo extends Component {
 
     state = {
-        fragment: null,
-        vertex: null
+        shaders: {},
+        current: 0
     }
 
     componentDidMount() {
@@ -20,28 +22,47 @@ class Demo extends Component {
         
         Helpers.getVertex(this.props.folderName)
         .then(res => res.text())
-        .then(vertex => this.setState({ vertex }))
+        .then(vertex => this.setState({ shaders: {...this.state.shaders, [shaders[0]]: vertex} }))
         .catch(err => console.error(err));
 
         Helpers.getFragment(this.props.folderName)
         .then(res => res.text())
-        .then(fragment => this.setState({ fragment }))
+        .then(fragment => this.setState({ shaders: {...this.state.shaders, [shaders[1]]: fragment} }))
         .catch(err => console.error(err));
     }
 
     render() {
         const promise = new Promise((resolve, reject) => {
-            if(this.state.vertex && this.state.fragment) {
-                resolve(this.state)
+            if(this.state.shaders[shaders[0]] && this.state.shaders[shaders[1]]) {
+                resolve(this.state.shaders)
             }
         });
 
+        const Inputs = shaders.map((shader, index) =>
+            <div className='ShaderCode__input' key={index}>
+                <label className={'button'  + (this.state.current === index ? '' : ' style3')}>
+                    <input
+                        type='radio'
+                        name='shader'
+                        checked={this.state.current === index}
+                        onChange={(e) => this.setState({current: index})}
+                    />
+                    {shader.toUpperCase()}
+                </label>
+            </div>
+        );
+
         return (
             <div className='Demo'>
-                <h1>{this.props.folderName}</h1>
+                <div className='ShaderCode__header'>
+                    <h1>{this.props.folderName}</h1>
+                    <div className={'ShaderCode__inputs'}>
+                        {Inputs}
+                    </div>
+                </div>
                 <div className='Demo__elements'>
                     <ThreeCanvas promise={promise} />
-                    <ShaderCode vertex={this.state.vertex} fragment={this.state.fragment} />
+                    <ShaderCode shader={this.state.shaders[shaders[this.state.current]]} />
                 </div>
             </div>
         );

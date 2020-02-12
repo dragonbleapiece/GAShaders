@@ -20,7 +20,7 @@ function App() {
           <Banner/>
         </Route>
         <Route path='/shader/'>
-          <nav>
+          <nav className='Menu'>
               <Link to='/'>Home</Link>
           </nav>
         </Route>
