@@ -15,5 +15,24 @@
   "bugs": {
     "url": "https://github.com/dragonbleapiece/GAShaders/issues"
   },
-  "homepage": "https://github.com/dragonbleapiece/GAShaders#readme"
+  "homepage": "https://github.com/dragonbleapiece/GAShaders#readme",
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^7.2.1",
+    "express": "^4.17.1",
+    "ganja.js": "^1.0.166",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.3.0",
+    "react-syntax-highlighter": "^12.2.1",
+    "three": "^0.112.1"
+  }
 }
