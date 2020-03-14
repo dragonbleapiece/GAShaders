@@ -29,12 +29,12 @@ float r(vec2 n)
     return r(dot(n,vec2(2.46,-1.21)));
 }
 
-vec3 smallTrianglesColor(vec3 pos)
+vec3 smallTrianglesColor(vec3 pos, vec3 nor)
 {
     float a = (radians(60.0));
     float zoom = 0.5;
 	vec2 c = (pos.xy + vec2(0.0, pos.z)) * vec2(sin(a),1.0);//scaled coordinates
-    c = ((c+vec2(c.y,0.0)*cos(a))/zoom) + vec2(floor((c.x-c.y*cos(a))/zoom*4.0)/4.0,0.0);//Add rotations
+    c = ((c+vec2(nor.y,0.0)*cos(a))/zoom) + vec2(floor((nor.x-nor.y*cos(a))/zoom*4.0)/4.0,0.0);//Add rotations
     float type = (r(floor(c*4.0))*0.2+r(floor(c*2.0))*0.3+r(floor(c))*0.5);//Randomize type
     type += 0.2 * sin(u_time*5.0*type);
     
@@ -46,12 +46,12 @@ vec3 smallTrianglesColor(vec3 pos)
 	return mix(type, l, 0.5) * vec3(0.2,0.5,1);
 } 
 
-vec3 largeTrianglesColor(vec3 pos)
+vec3 largeTrianglesColor(vec3 pos, vec3 nor)
 {
     float a = (radians(60.0));
     float zoom = 2.0;
 	vec2 c = (pos.xy + vec2(0.0, pos.z)) * vec2(sin(a),1.0);//scaled coordinates
-    c = ((c+vec2(c.y,0.0)*cos(a))/zoom) + vec2(floor((c.x-c.y*cos(a))/zoom*4.0)/4.0,0.0);//Add rotations
+    c = ((c+vec2(nor.y,0.0)*cos(a))/zoom) + vec2(floor((nor.x-nor.y*cos(a))/zoom*4.0)/4.0,0.0);//Add rotations
     
     float l = min(min((1.0 - (2.0 * abs(fract((c.x-c.y)*4.0) - 0.5))),
         	      (1.0 - (2.0 * abs(fract(c.y * 4.0) - 0.5)))),
@@ -82,9 +82,8 @@ vec3 radar( in vec3 pos, in vec3 nor )
 	float res = abs(dot(pVertex, dual(scaledSphere)).one);
 	float border = maxBorder * var;
 
-	vec3 n = normalize(vec3(res));
-    vec3 c1 = largeTrianglesColor(pos);
-    vec3 c = smallTrianglesColor(pos);
+    vec3 c1 = largeTrianglesColor(pos, nor);
+    vec3 c = smallTrianglesColor(pos, nor);
     c *= smoothstep(border - 1.0, border - 2.5, res);
 	c += c1;
     c = mix(c, vec3(0.01), smoothstep(border - 4.0, border - 10.0, res));
