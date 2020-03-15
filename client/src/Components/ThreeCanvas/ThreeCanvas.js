@@ -86,7 +86,7 @@ class ThreeCanvas extends Component {
                         requestAnimationFrame( animate );
             
                         // required if controls.enableDamping or controls.autoRotate are set to true
-                        //controls.update();
+                        controls.update();
                         self.updateShader(scene);
             
                         self.renderer.render( scene, self.camera );
@@ -159,7 +159,7 @@ class ThreeCanvas extends Component {
                         roughnessMap: {value: oldMat.roughnessMap},
                         opacity: {value: oldMat.opacity},
                         u_time: {value: this.clock.getElapsedTime()},
-                        u_resolution: {value: THREE.Vector3(1, 1)},
+                        u_resolution: {value: new THREE.Vector3(1, 1, 0)},
                         ...uniforms
                     },
                 
