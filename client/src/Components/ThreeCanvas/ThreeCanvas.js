@@ -86,7 +86,7 @@ class ThreeCanvas extends Component {
                         requestAnimationFrame( animate );
             
                         // required if controls.enableDamping or controls.autoRotate are set to true
-                        controls.update();
+                        //controls.update();
                         self.updateShader(scene);
             
                         self.renderer.render( scene, self.camera );
