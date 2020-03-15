@@ -1,4 +1,4 @@
-const url = 'https://server-gashaders.herokuapp.com/';
+const url = 'https://server-gashaders.herokuapp.com';
 
 class Helpers {
     static url(route = '/') {
