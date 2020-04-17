@@ -77,7 +77,7 @@ vec3 radar( in vec3 pos, in vec3 nor )
 	float maxBorder = 20.;
 
 	// time variable
-	float var = abs(mod(u_time * speed, 1.0));
+	float var = mod(u_time * speed, 1.0);
 
 	// create the sphere
 	CGA p1 = point(radius, 0., 0.);

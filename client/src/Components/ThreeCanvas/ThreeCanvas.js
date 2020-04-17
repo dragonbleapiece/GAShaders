@@ -126,12 +126,15 @@ class ThreeCanvas extends Component {
         node.children.forEach((child, index) => {
             if(child.isMesh) {
                 const oldMat = child.material;
+                
+                //https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/UniformsLib.js
                 const uniforms = THREE.UniformsUtils.merge([
-                    THREE.UniformsLib["ambient"],
+                    THREE.UniformsLib["common"],
                     THREE.UniformsLib["lights"]
                 ]);
                 const material = new THREE.ShaderMaterial( {
                     uniforms: {
+                        ...uniforms,
                         alphaMap: {value: oldMat.alphaMap},
                         aoMap: {value: oldMat.aoMap},
                         aoMapIntensity: {value: oldMat.aoMapIntensity},
@@ -159,8 +162,7 @@ class ThreeCanvas extends Component {
                         roughnessMap: {value: oldMat.roughnessMap},
                         opacity: {value: oldMat.opacity},
                         u_time: {value: this.clock.getElapsedTime()},
-                        u_resolution: {value: new THREE.Vector3(1, 1, 0)},
-                        ...uniforms
+                        u_resolution: {value: new THREE.Vector3(1, 1, 0)}
                     },
                 
                     extensions: {

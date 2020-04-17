@@ -656,6 +656,6 @@ vec4 CGA2vec4(CGA a) {
 
 CGA rotor(float angle, CGA axis) { return sadd(cos(angle/2.), normalized(muls(axis, -sin(angle/2.)))); }
 CGA translator(CGA t) { return ssub(1.0, smul(0.5, geometric(t, get_ei()))); }
-CGA dilator(float s) { return ssub(1., smul((1. - s) / (1. + s), meet(get_eo(), get_ei()))); }
+CGA dilator(float s) { return ssub(1., smul((1. - max(0., s)) / (1. + max(0., s)), meet(get_eo(), get_ei()))); }
 
 `;
