@@ -1,6 +1,7 @@
 .ShaderCode {
     width: 100%;
     margin-top: -50vh;
+    overflow-x: auto;
 }
 
 .ShaderCode code span {

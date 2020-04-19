@@ -1,8 +1,7 @@
-#define TOON
+#define STANDARD
 varying vec3 vViewPosition;
-varying vec3 vNormal;
-#define USE_NORMALMAP
 #ifndef FLAT_SHADED
+	varying vec3 vNormal;
 	#ifdef USE_TANGENT
 		varying vec3 vTangent;
 		varying vec3 vBitangent;
@@ -12,7 +11,6 @@ varying vec3 vNormal;
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
-uniform sampler2D normalMap;
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -30,8 +28,8 @@ void main() {
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
-	vNormal = normalize( transformedNormal );
 #ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
+	vNormal = normalize( transformedNormal );
 	#ifdef USE_TANGENT
 		vTangent = normalize( transformedTangent );
 		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
@@ -40,9 +38,7 @@ void main() {
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
-	//#include <displacementmap_vertex>
-	//vec3 texNormal = texture2D( normalMap, vUv );
-	//transformed += normalize( objectNormal ) * ( (1. - (texNormal.x + texNormal.y + texNormal.z) / 3.));
+	#include <displacementmap_vertex>
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

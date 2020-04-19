@@ -8,7 +8,6 @@ varying vec3 vViewPosition;
 	#endif
 #endif
 #include <common>
-#include <pga3d>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
