@@ -34,6 +34,30 @@ router.get('/:folder/fragment', function(req, res, next) {
   });
 });
 
+router.get('/:folder/view', function(req, res, next) {
+  const options = {
+    root: shadersFolder
+  };
+  const fileName = path.join(req.params.folder, 'view.png');
+  res.sendFile(fileName, options, function(err) {
+    if(err) {
+      next(err);
+    }
+  });
+});
+
+router.get('/:folder/description', function(req, res, next) {
+  const options = {
+    root: shadersFolder
+  };
+  const fileName = path.join(req.params.folder, 'description.txt');
+  res.sendFile(fileName, options, function(err) {
+    if(err) {
+      next(err);
+    }
+  });
+});
+
 router.get('/:folder/vertex', function(req, res, next) {
   const options = {
     root: shadersFolder

@@ -1,6 +1,6 @@
+// inspired by https://www.shadertoy.com/view/4tlXWs
 #include <common>
 uniform vec3 diffuse;
-uniform float opacity;
 varying vec3 vViewPosition;
 #ifndef FLAT_SHADED
 	varying vec3 vNormal;
@@ -10,13 +10,11 @@ varying vec3 vViewPosition;
 	#endif
 #endif
 #include <uv_pars_fragment>
-#include <map_pars_fragment>
 #include <normalmap_pars_fragment>
 
+// the CGA library I added to Threejs library
 #include <cga>
 uniform float u_time;
-
-// inspired by https://www.shadertoy.com/view/4tlXWs
 
 // can't explain
 float r(float n)
@@ -86,11 +84,11 @@ vec3 radar( in vec3 pos, in vec3 nor )
 	CGA p4 = point(0., -radius, 0.);
 
 	// sphere = (p1 ^ p2) ^ (p3 ^ p4)
+	// ^ : wedge operator
 	CGA sphere = meet(meet(p1, p2), meet(p3, p4));
 	
-	// dilator
+	// dilator for rescaling the sphere
 	CGA scale = dilator(var);
-	//CGA t = translator(smul(cos(u_time * speed), get_e1()));
 	
 	// dilated sphere = scale * sphere * inv(scale)
 	CGA scaledSphere = geometric(geometric(scale, sphere), reverse(scale));
@@ -100,9 +98,15 @@ vec3 radar( in vec3 pos, in vec3 nor )
 
 	// get the distance between the point and the sphere
 	// res = max(0, pVertex | !scaledSphere)
+	// | is the dot operator and ! is the dual operator
 	float res = max(0., dot(pVertex, dual(scaledSphere)).one);
+	// the result is stocked in the scalar attribute
+	// The CGA object is constituted by 32 attributes, scalar, vectors and multivectors
+	// It can be largely optimized but it is not the actual subject.
+	
 	float border = maxBorder * var;
 
+	// apply the triangles effect and mix it
     vec3 c1 = largeTrianglesColor(pos, nor);
     vec3 c = smallTrianglesColor(pos, nor);
     c *= smoothstep(border - 1.0, border - 2.5, res);
@@ -118,12 +122,10 @@ void main() {
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
-	// material
+	// get material
 	vec3 mal = radar( vViewPosition.xyz, normal );
+	// ease the result
 	vec3 col = pow( clamp(mal,0.0,1.0), vec3(0.5) );
-
-	//vec4 diffuseColor = vec4( col, opacity );
-	//#include <map_fragment>
 
     gl_FragColor = vec4(col, 1.0);
 }

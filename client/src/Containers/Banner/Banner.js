@@ -10,7 +10,7 @@ class Banner extends Component {
                 <div className="inner">
                     <header>
                         <h1>Shaders Gallery</h1>
-                        <p>Gallery of shaders experimentations in <i>WebGL</i><br />
+                        <p>Gallery of shaders experimentations in <i>WebGL2</i><br />
                         using <a href="https://threejs.org/">Three.js</a> and the <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Sponza">Sponza model</a>.</p>
                     </header>
                     <a href="#main" className="more">Learn More</a>

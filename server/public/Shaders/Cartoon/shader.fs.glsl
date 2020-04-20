@@ -7,7 +7,7 @@ uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
 uniform float opacity;
-const float shininess = 2.0;
+const float shininess = 2.0; // toon glow
 uniform float transparency;
 uniform float reflectivity;
 uniform float clearcoat;
@@ -50,7 +50,10 @@ uniform float clearcoatRoughness;
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
+// Size of the kernel
 const int LAPGAUSS_SIZE = 7;
+// Laplacian-Gaussian Kernel with sigma = 4
+// Laplacian is here for higlighting the edges and Gaussian for bluring
 const vec2 LAPGAUSS_FILTER[LAPGAUSS_SIZE] =
 vec2[] (
 	vec2(-3.0,	-0.121597),
@@ -62,7 +65,11 @@ vec2[] (
 	vec2(3.0,	-0.121597)
 );
 
+// Color intensity of the fresnel
+// Fresnel is here for objects light contouring
+// This methods is highly dependant of the camera view as drawback
 const vec3 FRESNEL_COLOR = vec3(0.6);
+// Exponent for reinforcing the contouring aspect
 const float FRESNEL_EXPONENT = 10.;
 
 void main() {
@@ -72,6 +79,7 @@ void main() {
 	vec3 totalEmissiveRadiance = emissive;
 	#include <logdepthbuf_fragment>
 	//#include <map_fragment>
+	// Use one unique color of the texture map
 #ifdef USE_MAP
 	vec4 texelColor = texture2D( map, vec2(0.4, 0.4) ); // purely arbitrary
 	texelColor = mapTexelToLinear( texelColor );
@@ -86,52 +94,73 @@ void main() {
 
 	#include <normal_fragment_maps>
 
+// Do the laplacian-gaussian on the normal map
+// The tangent space is here to find the perturbation in the normal
+// It's not necessary here to be in this condition, but it is the common verified condition
 #if defined( TANGENTSPACE_NORMALMAP )
+	// mapN already defined in <normal_fragment_maps>
 	mapN = vec3(0.0);
+	// width and height of the normalMap
 	vec2 mapN_size = vec2(textureSize(normalMap, 0));
+	// scale to find the neighborhood
 	vec2 mapN_scale = vec2(1.) / mapN_size;
 	for( int i = 0; i < LAPGAUSS_SIZE; i++ )
 	{
+		// calculate the texture coordinates
 		vec2 texCoord = vUv + vec2(LAPGAUSS_FILTER[i].x * mapN_scale.x, LAPGAUSS_FILTER[i].x * mapN_scale.y);
+		// Repeat pattern as solution to information loss by kernel
 		if(texCoord.x < 0.) texCoord.x += 1.;
 		if(texCoord.y < 0.) texCoord.y += 1.;
 		if(texCoord.x > 1.) texCoord.x -= 1.;
 		if(texCoord.y > 1.) texCoord.y -= 1.;
+		// add the laplacian-gaussian filter to the result
 		mapN += texture2D( normalMap, texCoord).rgb * LAPGAUSS_FILTER[i].y;
 	}
+	// the edges are highlighted, we want the opposite to be visible
 	mapN = 1.0 - (mapN * 2.0 - 1.0);
+	// rescale the normal. The normalScale is a uniform given in <normalmap_pars_fragment>
 	mapN.xy *= normalScale;
 	#ifdef USE_TANGENT
+		// vTBN is the Tangent-Bitangent-Normal matrix. Given in <normal_fragment_begin>
 		normal = normalize( vTBN * mapN );
 	#else
 		normal = perturbNormal2Arb( -vViewPosition, normal, mapN );
 	#endif
 #endif
 
+	// Threejs clearcoat calculation. Unused.
 	#include <clearcoat_normal_fragment_begin>
 	#include <clearcoat_normal_fragment_maps>
+
+	// Threejs emissive calculation. Unused in Sponza.
 	#include <emissivemap_fragment>
+	// Threejs specular calculation
 	#include <specularmap_fragment>
+// If has specularMap uniform...
 #ifdef USE_SPECULARMAP
 	vec3 specular = texelSpecular.rgb;
 #else
 	vec3 specular = vec3(0.);
 #endif
+
 	// accumulation
+	// Use the toon effect from Threejs library
 	#include <lights_toon_fragment>
 	#include <lights_fragment_begin>
 	#include <lights_fragment_maps>
 	#include <lights_fragment_end>
+
 	// modulation
 	#include <aomap_fragment>
 
-	// for fresnel contouring
+	// Add fresnel for contouring
 	float fresnel = dot(vNormal, vViewPosition);
 	fresnel = saturate(1.0 - fresnel);
 	fresnel = pow(fresnel, FRESNEL_EXPONENT);
 	vec3 fresnelColor = fresnel * diffuseColor.rgb * FRESNEL_COLOR;
-	totalEmissiveRadiance -= fresnelColor; // for negative effect
+	totalEmissiveRadiance -= fresnelColor; // minus for negative effect
 
+	// sum the light color
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 	// this is a stub for the transparency model
 	diffuseColor.a *= saturate( 1. - transparency + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );

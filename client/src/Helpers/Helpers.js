@@ -17,6 +17,10 @@ class Helpers {
         return fetch(this.url('/api/'+folder+'/fragment'));
     }
 
+    static getDescription(folder) {
+        return fetch(this.url('/api/'+folder+'/description'));
+    }
+
     static getImageData( image ) {
 
         let canvas = document.createElement( 'canvas' );

@@ -1,3 +1,6 @@
+/* Shader for radar / scanning effect. Get closer from the model to watch the effect.
+ * I added Geometry Algebra calculation for an university project (find it in the Fragment Shader)
+ */
 #define STANDARD
 varying vec3 vViewPosition;
 #ifndef FLAT_SHADED
@@ -19,6 +22,7 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
+// This is the standard Threejs Vertex Shader. All the methods are not useful.
 void main() {
 	#include <uv_vertex>
 	#include <uv2_vertex>

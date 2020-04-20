@@ -1,3 +1,7 @@
+/* This demo experiments the toon effect. Since the effect is already in the Threejs library, I reused it.
+ * I added some effects for cleaning the realism noisy original aspect of the Sponza model.
+ * This is the standard Threejs Vertex Shader.
+ */
 #define TOON
 varying vec3 vViewPosition;
 varying vec3 vNormal;
