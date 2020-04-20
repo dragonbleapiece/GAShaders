@@ -168,6 +168,7 @@ class ThreeCanvas extends Component {
                         aoMapIntensity: {value: oldMat.aoMapIntensity},
                         bumpMap: {value: oldMat.bumpMap},
                         bumpScale: {value: oldMat.bumpScale},
+                        diffuse: {value: oldMat.color},
                         displacementMap: {value: oldMat.displacementMap},
                         displacementScale: {value: oldMat.displacementScale},
                         displacementBias: {value: oldMat.displacementBias},
