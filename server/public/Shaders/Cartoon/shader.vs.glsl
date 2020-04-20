@@ -12,7 +12,6 @@ varying vec3 vNormal;
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
-uniform sampler2D normalMap;
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -40,9 +39,6 @@ void main() {
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
-	//#include <displacementmap_vertex>
-	//vec3 texNormal = texture2D( normalMap, vUv );
-	//transformed += normalize( objectNormal ) * ( (1. - (texNormal.x + texNormal.y + texNormal.z) / 3.));
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

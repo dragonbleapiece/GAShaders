@@ -50,20 +50,20 @@ uniform float clearcoatRoughness;
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
-const int GAUSS_SIZE = 7;
-const vec2 GAUSS_FILTER[GAUSS_SIZE] =
+const int LAPGAUSS_SIZE = 7;
+const vec2 LAPGAUSS_FILTER[LAPGAUSS_SIZE] =
 vec2[] (
-	vec2(-3.0,	0.121597),
-	vec2(-2.0,	0.142046),
-	vec2(-1.0,	0.155931),
-	vec2(0.0,	0.160854),
-	vec2(1.0,	0.155931),
-	vec2(2.0,	0.142046),
-	vec2(3.0,	0.121597)
+	vec2(-3.0,	-0.121597),
+	vec2(-2.0,	-0.142046),
+	vec2(-1.0,	-0.155931),
+	vec2(0.0,	0.160854 * 6.),
+	vec2(1.0,	-0.155931),
+	vec2(2.0,	-0.142046),
+	vec2(3.0,	-0.121597)
 );
 
-const vec2 GAUSS_SCALE = vec2(1.0, 1.0);
-// Scale is vec2(0, 1.0/height ) for vertical blur and vec2(1.0/width, 0 ) for horizontal blur
+const vec3 FRESNEL_COLOR = vec3(0.6);
+const float FRESNEL_EXPONENT = 10.;
 
 void main() {
 	#include <clipping_planes_fragment>
@@ -73,7 +73,7 @@ void main() {
 	#include <logdepthbuf_fragment>
 	//#include <map_fragment>
 #ifdef USE_MAP
-	vec4 texelColor = texture2D( map, vec2(0., 0.) );
+	vec4 texelColor = texture2D( map, vec2(0.4, 0.4) ); // purely arbitrary
 	texelColor = mapTexelToLinear( texelColor );
 	diffuseColor *= texelColor;
 #endif
@@ -83,17 +83,31 @@ void main() {
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
 	#include <normal_fragment_begin>
-	//#include <normal_fragment_maps>
 
-#ifdef TANGENTSPACE_NORMALMAP 
-	vec3 normalMap_blur = vec3(0.0);
-	for( int i = 0; i < GAUSS_SIZE; i++ )
+	#include <normal_fragment_maps>
+
+#if defined( TANGENTSPACE_NORMALMAP )
+	mapN = vec3(0.0);
+	vec2 mapN_size = vec2(textureSize(normalMap, 0));
+	vec2 mapN_scale = vec2(1.) / mapN_size;
+	for( int i = 0; i < LAPGAUSS_SIZE; i++ )
 	{
-		normalMap_blur += texture2D( normalMap, vec2( vUv.x + GAUSS_FILTER[i].x * GAUSS_SCALE.x, vUv.y + GAUSS_FILTER[i].x * GAUSS_SCALE.y ) ).rgb * GAUSS_FILTER[i].y;
+		vec2 texCoord = vUv + vec2(LAPGAUSS_FILTER[i].x * mapN_scale.x, LAPGAUSS_FILTER[i].x * mapN_scale.y);
+		if(texCoord.x < 0.) texCoord.x += 1.;
+		if(texCoord.y < 0.) texCoord.y += 1.;
+		if(texCoord.x > 1.) texCoord.x -= 1.;
+		if(texCoord.y > 1.) texCoord.y -= 1.;
+		mapN += texture2D( normalMap, texCoord).rgb * LAPGAUSS_FILTER[i].y;
 	}
-	normalMap_blur.xy *= normalScale;
-	normal = normalize(vTBN  * normalMap_blur);
+	mapN = 1.0 - (mapN * 2.0 - 1.0);
+	mapN.xy *= normalScale;
+	#ifdef USE_TANGENT
+		normal = normalize( vTBN * mapN );
+	#else
+		normal = perturbNormal2Arb( -vViewPosition, normal, mapN );
+	#endif
 #endif
+
 	#include <clearcoat_normal_fragment_begin>
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
@@ -110,6 +124,14 @@ void main() {
 	#include <lights_fragment_end>
 	// modulation
 	#include <aomap_fragment>
+
+	// for fresnel contouring
+	float fresnel = dot(vNormal, vViewPosition);
+	fresnel = saturate(1.0 - fresnel);
+	fresnel = pow(fresnel, FRESNEL_EXPONENT);
+	vec3 fresnelColor = fresnel * diffuseColor.rgb * FRESNEL_COLOR;
+	totalEmissiveRadiance -= fresnelColor; // for negative effect
+
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 	// this is a stub for the transparency model
 	diffuseColor.a *= saturate( 1. - transparency + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );

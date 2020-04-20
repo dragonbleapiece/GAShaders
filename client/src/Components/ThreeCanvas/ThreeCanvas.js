@@ -58,7 +58,8 @@ class ThreeCanvas extends Component {
         this.renderer.setSize( rectContainer.width, rectContainer.height );
         this.renderer.setPixelRatio( window.devicePixelRatio );
 
-        const effect = new OutlineEffect(this.renderer);
+        //const effect = new OutlineEffect(this.renderer);
+        const effect = this.renderer;
 
         const controls = new OrbitControls( this.camera, this.renderer.domElement );
 
