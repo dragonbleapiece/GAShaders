@@ -1,3 +1,7 @@
+/* Standard shaders of Threejs. Used for debug / verifying the functionality
+ * The #define are here to give different behavior to models w.r.t. valid uniforms
+ * The #include is reserved to Threejs api that injects the glsl code before compilation
+ */
 #define STANDARD
 varying vec3 vViewPosition;
 #ifndef FLAT_SHADED
@@ -8,7 +12,6 @@ varying vec3 vViewPosition;
 	#endif
 #endif
 #include <common>
-#include <pga3d>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>

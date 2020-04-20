@@ -1,10 +1,12 @@
-/* Shader for radar / scanning effect. Get closer from the model to watch the effect.
- * I added Geometry Algebra calculation for an university project (find it in the Fragment Shader)
+/* This demo experiments the toon effect. Since the effect is already in the Threejs library, I reused it.
+ * I added some effects for cleaning the realism noisy original aspect of the Sponza model.
+ * This is the standard Threejs Vertex Shader.
  */
-#define STANDARD
+#define TOON
 varying vec3 vViewPosition;
+varying vec3 vNormal;
+#define USE_NORMALMAP
 #ifndef FLAT_SHADED
-	varying vec3 vNormal;
 	#ifdef USE_TANGENT
 		varying vec3 vTangent;
 		varying vec3 vBitangent;
@@ -22,7 +24,6 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
-// This is the standard Threejs Vertex Shader. All the methods are not useful.
 void main() {
 	#include <uv_vertex>
 	#include <uv2_vertex>
@@ -32,8 +33,8 @@ void main() {
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
-#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 	vNormal = normalize( transformedNormal );
+#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 	#ifdef USE_TANGENT
 		vTangent = normalize( transformedTangent );
 		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
@@ -42,7 +43,6 @@ void main() {
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
-	#include <displacementmap_vertex>
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

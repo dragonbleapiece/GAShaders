@@ -1,17 +1,29 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import Helpers from '../../Helpers/Helpers';
 import './Thumbnail.css';
 
 class Thumbnail extends Component {
 
+    state = {
+        description : "Loading..."
+    }
+
+    componentDidMount() {
+        Helpers.getDescription(this.props.folderName)
+        .then(res => res.text())
+        .then(description => this.setState({ description }))
+        .catch(err => console.error(err));
+    }
+
     render() {
         return (
             <div className='box'>
-                <Link to={'/shader/' + this.props.folderName} className='image fit'><img src="images/pic01.jpg" alt="" /></Link>
+                <Link to={'/shader/' + this.props.folderName} className='image fit'><img src={Helpers.url('/api/' + this.props.folderName + '/view')} alt="view" /></Link>
                 <div className="inner">
-                    <h3>{'To Shader ' + this.props.folderName}</h3>
-                    <p>Interdum amet accumsan placerat commodo ut amet aliquam blandit nunc tempor lobortis nunc non. Mi accumsan.</p>
-                    <Link to={'/shader/' + this.props.folderName} className='button fit'>Go</Link>
+                    <h3>{this.props.folderName + ' Shader'}</h3>
+                    <p>{this.state.description}</p>
+                    <Link to={'/shader/' + this.props.folderName} className='button fit'>Go to Demo</Link>
                 </div>
             </div>
         );

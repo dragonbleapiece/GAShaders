@@ -1,6 +1,6 @@
+// inspired by https://www.shadertoy.com/view/4tlXWs
 #include <common>
 uniform vec3 diffuse;
-uniform float opacity;
 varying vec3 vViewPosition;
 #ifndef FLAT_SHADED
 	varying vec3 vNormal;
@@ -10,25 +10,26 @@ varying vec3 vViewPosition;
 	#endif
 #endif
 #include <uv_pars_fragment>
-#include <map_pars_fragment>
 #include <normalmap_pars_fragment>
 
+// the CGA library I added to Threejs library
 #include <cga>
 uniform float u_time;
 
-// inspired by https://www.shadertoy.com/view/4tlXWs
-
-// dunno what is it
+// can't explain
 float r(float n)
 {
  	return fract(abs(sin(n*55.753)*367.34));   
 }
 
+// can't explain
 float r(vec2 n)
 {
     return r(dot(n,vec2(2.46,-1.21)));
 }
 
+// create small triangles pattern
+// the normal is here to orientate the shapes
 vec3 smallTrianglesColor(vec3 pos, vec3 nor)
 {
     float a = (radians(60.0));
@@ -46,6 +47,8 @@ vec3 smallTrianglesColor(vec3 pos, vec3 nor)
 	return mix(type, l, 0.5) * vec3(0.2,0.5,1);
 } 
 
+// create large triangles pattern
+// the normal is here to orientate the shapes
 vec3 largeTrianglesColor(vec3 pos, vec3 nor)
 {
     float a = (radians(60.0));
@@ -61,27 +64,49 @@ vec3 largeTrianglesColor(vec3 pos, vec3 nor)
 	return mix(0.01, l, 0.5) * vec3(0.2,0.5,1);
 }
 
+// create the radar
 vec3 radar( in vec3 pos, in vec3 nor )
 {
+	// radar propagation speed
 	float speed = 0.1;
-	float maxRadius = 0.5;
+	// minimal radius of the sphere
+	float radius = 0.5;
+	// maximal radius of the radar border
 	float maxBorder = 20.;
-	float var = abs(mod(u_time * speed, 1.0));
 
-	CGA p1 = point(maxRadius, 0., 0.);
-	CGA p2 = point(0., maxRadius, 0.);
-	CGA p3 = point(0., 0., -maxRadius);
-	CGA p4 = point(0., -maxRadius, 0.);
+	// time variable
+	float var = mod(u_time * speed, 1.0);
+
+	// create the sphere
+	CGA p1 = point(radius, 0., 0.);
+	CGA p2 = point(0., radius, 0.);
+	CGA p3 = point(0., 0., -radius);
+	CGA p4 = point(0., -radius, 0.);
+
+	// sphere = (p1 ^ p2) ^ (p3 ^ p4)
+	// ^ : wedge operator
 	CGA sphere = meet(meet(p1, p2), meet(p3, p4));
+	
+	// dilator for rescaling the sphere
 	CGA scale = dilator(var);
-	//CGA t = translator(smul(cos(u_time * speed), get_e1()));
+	
+	// dilated sphere = scale * sphere * inv(scale)
 	CGA scaledSphere = geometric(geometric(scale, sphere), reverse(scale));
 
+	// convert vertex positions to CGA point
 	CGA pVertex = point(pos);
 
-	float res = abs(dot(pVertex, dual(scaledSphere)).one);
+	// get the distance between the point and the sphere
+	// res = max(0, pVertex | !scaledSphere)
+	// | is the dot operator and ! is the dual operator
+	float res = max(0., dot(pVertex, dual(scaledSphere)).one);
+	// the result is stocked in the scalar attribute
+	// The CGA object is constituted by 32 attributes, scalar, vectors and multivectors
+	// It can be largely optimized but it is not the actual subject.
+	
 	float border = maxBorder * var;
 
+	// apply the triangles effect and mix it
     vec3 c1 = largeTrianglesColor(pos, nor);
     vec3 c = smallTrianglesColor(pos, nor);
     c *= smoothstep(border - 1.0, border - 2.5, res);
@@ -97,12 +122,10 @@ void main() {
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
-	// material
+	// get material
 	vec3 mal = radar( vViewPosition.xyz, normal );
+	// ease the result
 	vec3 col = pow( clamp(mal,0.0,1.0), vec3(0.5) );
-
-	//vec4 diffuseColor = vec4( col, opacity );
-	//#include <map_fragment>
 
     gl_FragColor = vec4(col, 1.0);
 }

@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { WEBGL } from 'three/examples/jsm/WebGL.js';
+import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js';
 import Helpers from '../../Helpers/Helpers.js';
-import Algebra from 'ganja.js';
 import './ThreeCanvas.css';
 
 class ThreeCanvas extends Component {
@@ -42,20 +43,29 @@ class ThreeCanvas extends Component {
         const rectContainer = this.refs.container.getBoundingClientRect();
         this.camera = new THREE.PerspectiveCamera( 75, rectContainer.width / rectContainer.height, 0.1, 1000 );
 
-        const ambientLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 5 );
+        const ambientLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
+        scene.add( ambientLight );
         //const mainLight = new THREE.DirectionalLight( 0xffffff, 5 );
         //mainLight.position.set( 10, 10, 10 );
+        // TODO faire une point light sur la position de la caméra
       
-        scene.add( ambientLight );
+        const pointLight = new THREE.PointLight(0xeeeeff, 1, 5);
+        scene.add(pointLight)
         
-        this.renderer = new THREE.WebGLRenderer({canvas: this.refs.canvas, antialias: true});
+        const context = this.refs.canvas.getContext('webgl2', {alpha: false});
+
+        this.renderer = new THREE.WebGLRenderer({canvas: this.refs.canvas, context: context, antialias: true});
         this.renderer.setSize( rectContainer.width, rectContainer.height );
         this.renderer.setPixelRatio( window.devicePixelRatio );
+
+        //const effect = new OutlineEffect(this.renderer);
+        const effect = this.renderer;
 
         const controls = new OrbitControls( this.camera, this.renderer.domElement );
 
         //controls.update() must be called after any manual changes to the camera's transform
         this.camera.position.set( 0, 20, 100 );
+        pointLight.position.copy(this.camera.position);
         controls.update();
 
         // Instantiate a loader
@@ -88,8 +98,9 @@ class ThreeCanvas extends Component {
                         // required if controls.enableDamping or controls.autoRotate are set to true
                         controls.update();
                         self.updateShader(scene);
-            
-                        self.renderer.render( scene, self.camera );
+                        pointLight.position.copy(self.camera.position);
+
+                        effect.render( scene, self.camera );
                     };
             
                     animate();
@@ -122,22 +133,41 @@ class ThreeCanvas extends Component {
         });
     }
 
+    // this function injects specified shaders as material for all already loaded nodes*
+    // it is not optimized
     includeShader(node, vertex, fragment) {
         node.children.forEach((child, index) => {
             if(child.isMesh) {
                 const oldMat = child.material;
+
+                //https://github.com/mrdoob/three.js/blob/master/src/renderers/shaders/UniformsLib.js
                 const uniforms = THREE.UniformsUtils.merge([
-                    THREE.UniformsLib["ambient"],
-                    THREE.UniformsLib["lights"]
+                    THREE.UniformsLib["common"],
+                    THREE.UniformsLib["lights"],
+                    THREE.UniformsLib["specularmap"],
+                    THREE.UniformsLib["envmap"],
+                    THREE.UniformsLib["aomap"],
+                    THREE.UniformsLib["lightmap"],
+                    THREE.UniformsLib["emissivemap"],
+                    THREE.UniformsLib["bumpmap"],
+                    THREE.UniformsLib["normalmap"],
+                    THREE.UniformsLib["displacementmap"],
+                    THREE.UniformsLib["roughnessmap"],
+                    THREE.UniformsLib["metalnessmap"],
+                    THREE.UniformsLib["fog"],
+                    THREE.UniformsLib["points"],
+                    THREE.UniformsLib["sprite"],
                 ]);
+
                 const material = new THREE.ShaderMaterial( {
                     uniforms: {
+                        ...uniforms,
+                        // it is unnecessary to enumerate all uniforms... but I can have a look on them
                         alphaMap: {value: oldMat.alphaMap},
                         aoMap: {value: oldMat.aoMap},
                         aoMapIntensity: {value: oldMat.aoMapIntensity},
                         bumpMap: {value: oldMat.bumpMap},
                         bumpScale: {value: oldMat.bumpScale},
-                        diffuse: {value: oldMat.color},
                         displacementMap: {value: oldMat.displacementMap},
                         displacementScale: {value: oldMat.displacementScale},
                         displacementBias: {value: oldMat.displacementBias},
@@ -159,8 +189,7 @@ class ThreeCanvas extends Component {
                         roughnessMap: {value: oldMat.roughnessMap},
                         opacity: {value: oldMat.opacity},
                         u_time: {value: this.clock.getElapsedTime()},
-                        u_resolution: {value: new THREE.Vector3(1, 1, 0)},
-                        ...uniforms
+                        u_resolution: {value: new THREE.Vector3(1, 1, 0)}
                     },
                 
                     extensions: {
@@ -170,9 +199,7 @@ class ThreeCanvas extends Component {
                         shaderTextureLOD: false // set to use shader texture LOD
                     },
 
-                    defines: {
-                        "STANDARD": ""
-                    },
+
 
                     vertexShader: vertex,
                 
@@ -181,7 +208,7 @@ class ThreeCanvas extends Component {
                 
                 } );
 
-                for(let key in oldMat) {
+                for(let key in oldMat) { // forgotten ?
                     if(!material[key] && key !== "isMeshStandardMaterial" && key !== "name") {
                         material[key] = oldMat[key];
                     }
@@ -196,12 +223,10 @@ class ThreeCanvas extends Component {
         return node;
     }
 
-    GALoad() {
-        
-    }
-
     render() {
-
+        if( !WEBGL.isWebGL2Available() ) {
+            console.error(WEBGL.getWebGL2ErrorMessage());
+        }
         return (
             <div className='ThreeCanvas' ref='container'>
                 <canvas ref='canvas'></canvas>

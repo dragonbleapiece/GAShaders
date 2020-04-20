@@ -23,12 +23,14 @@
 .thumbnails .box {
     margin: 0 1em 2em 1em;
     width: 30%;
+    max-width: 30%;
 }
 
     @media screen and (max-width: 1280px) {
 
         .thumbnails .box {
             width: 45%;
+            max-width: 30%;
         }
 
     }
@@ -37,6 +39,7 @@
 
         .thumbnails .box {
             width: 100%;
+            max-width: 100%;
         }
 
     }
@@ -62,6 +65,7 @@
 
 .box .image img {
     border-radius: 4px 4px 0 0;
+    max-width: 100%;
 }
 
 .box .inner {
